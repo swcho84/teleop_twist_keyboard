@@ -34,26 +34,29 @@ e/c : increase/decrease only angular speed by 10%
 
 CTRL-C to quit
 """
-
+# add roll command
 moveBindings = {
-        'i':(1,0,0,0),
-        'o':(1,0,0,-1),
-        'j':(0,0,0,1),
-        'l':(0,0,0,-1),
-        'u':(1,0,0,1),
-        ',':(-1,0,0,0),
-        '.':(-1,0,0,1),
-        'm':(-1,0,0,-1),
-        'O':(1,-1,0,0),
-        'I':(1,0,0,0),
-        'J':(0,1,0,0),
-        'L':(0,-1,0,0),
-        'U':(1,1,0,0),
-        '<':(-1,0,0,0),
-        '>':(-1,-1,0,0),
-        'M':(-1,1,0,0),
-        't':(0,0,1,0),
-        'b':(0,0,-1,0),
+        'i':(1,0,0,0,0),
+        'o':(1,0,0,-1,0),
+        'j':(0,0,0,1,0),
+        'l':(0,0,0,-1,0),
+        'u':(1,0,0,1,0),
+        ',':(-1,0,0,0,0),
+        '.':(-1,0,0,1,0),
+        'm':(-1,0,0,-1,0),
+        'O':(1,-1,0,0,0),
+        'I':(1,0,0,0,0),
+        'J':(0,1,0,0,0),
+        'L':(0,-1,0,0,0),
+        'U':(1,1,0,0,0),
+        '<':(-1,0,0,0,0),
+        '>':(-1,-1,0,0,0),
+        'M':(-1,1,0,0,0),
+        't':(0,0,1,0,0),
+        'b':(0,0,-1,0,0),
+        'h':(0,0,0,0,1),  
+        'H':(0,0,0,0,1),
+        ';':(0,0,0,0,-1),
     }
 
 speedBindings={
@@ -72,7 +75,6 @@ def getKey():
     termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
     return key
 
-
 def vels(speed,turn):
     return "currently:\tspeed %s\tturn %s " % (speed,turn)
 
@@ -88,6 +90,7 @@ if __name__=="__main__":
     y = 0
     z = 0
     th = 0
+    yl = 0  # add roll command
     status = 0
 
     try:
@@ -100,6 +103,7 @@ if __name__=="__main__":
                 y = moveBindings[key][1]
                 z = moveBindings[key][2]
                 th = moveBindings[key][3]
+                yl = moveBindings[key][4]  # add roll command
             elif key in speedBindings.keys():
                 speed = speed * speedBindings[key][0]
                 turn = turn * speedBindings[key][1]
@@ -113,12 +117,14 @@ if __name__=="__main__":
                 y = 0
                 z = 0
                 th = 0
+                yl = 0
                 if (key == '\x03'):
                     break
 
+            # add roll command
             twist = Twist()
-            twist.linear.x = x*speed; twist.linear.y = y*speed; twist.linear.z = z*speed;
-            twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = th*turn
+            twist.linear.x = x*speed; twist.linear.y = yl*speed; twist.linear.z = z*speed
+            twist.angular.x = 0; twist.angular.y = y*turn; twist.angular.z = th*turn
             pub.publish(twist)
 
     except Exception as e:
